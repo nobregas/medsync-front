@@ -1,5 +1,25 @@
 import type { UserRole } from "@/types/role";
 
+export type DashboardMetric = {
+  title: string;
+  value: number | string;
+  description?: string;
+};
+
+export type DashboardAppointment = {
+  id: string;
+  time: string;
+  patient: string;
+  doctor: string;
+  status: "scheduled" | "completed" | "cancelled";
+};
+
+export type ReceptionistDashboardData = {
+  metrics: DashboardMetric[];
+  todayAppointments: DashboardAppointment[];
+  monthAppointments: DashboardAppointment[];
+};
+
 export interface DashboardMetrics {
   totalPatients: number;
   totalAppointmentsToday: number;

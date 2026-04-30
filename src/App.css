@@ -105,12 +105,32 @@
 
 .main-content {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   padding: 0;
 }
 
 .page-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   padding: 1.5rem;
   animation: fade-up 220ms ease both;
+}
+
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dashboard-page > .page-header,
+.dashboard-page > .metric-grid {
+  flex-shrink: 0;
 }
 
 .topbar {
@@ -263,6 +283,13 @@
   letter-spacing: -0.04em;
 }
 
+.page-description {
+  max-width: 680px;
+  margin: 0.75rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
 .button-row {
   display: flex;
   flex-wrap: wrap;
@@ -309,7 +336,34 @@
 }
 
 .dashboard-grid {
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.dashboard-grid > .card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.dashboard-grid > .card > .section-header {
+  flex-shrink: 0;
+}
+.scroll-container {
+  min-height: 0;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 0.25rem;
+}
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: 3px;
 }
 
 .card {
@@ -433,6 +487,11 @@
 .badge.warning {
   color: var(--color-warning-text);
   background: var(--color-warning-bg);
+}
+
+.badge.danger {
+  color: var(--color-danger-text);
+  background: var(--color-danger-bg);
 }
 
 .shortcut-list {
