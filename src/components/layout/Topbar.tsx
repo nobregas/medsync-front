@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { CalendarDays, LogOut, Menu, Plus } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 
 type TopbarProps = {
   onMenuClick: () => void
@@ -7,6 +9,35 @@ type TopbarProps = {
 
 export function Topbar({ onMenuClick }: TopbarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Administrador'
+      case 'doctor':
+        return 'Médico'
+      case 'receptionist':
+        return 'Recepcionista'
+      default:
+        return role
+    }
+  }
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase()
+  }
 
   return (
     <header className="topbar">
@@ -39,16 +70,16 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             aria-haspopup="menu"
             onClick={() => setIsUserMenuOpen((isOpen) => !isOpen)}
           >
-            AM
+            {user ? getInitials(user.name) : '??'}
           </button>
 
           {isUserMenuOpen && (
             <div className="logout-popover" role="menu">
               <div className="logout-user">
-                <p className="logout-name">Dra. Ana Martins</p>
-                <p className="logout-role">Medico</p>
+                <p className="logout-name">{user?.name}</p>
+                <p className="logout-role">{user ? getRoleLabel(user.role) : ''}</p>
               </div>
-              <button className="logout-button" type="button" role="menuitem">
+              <button className="logout-button" type="button" role="menuitem" onClick={handleLogout}>
                 <LogOut size={16} aria-hidden="true" />
                 Sair da conta
               </button>

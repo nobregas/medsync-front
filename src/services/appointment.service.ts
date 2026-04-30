@@ -1,7 +1,6 @@
 import type { Appointment, AppointmentStatus } from "@/features/appointments/types";
 import { 
   appointmentsMock, 
-  getAppointmentsByDate, 
   getAppointmentsByPatient,
   hasScheduleConflict 
 } from "@/features/appointments/mock";

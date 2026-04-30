@@ -1,25 +1,21 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { User } from "@/features/auth/types";
-import type { AuthState } from "@/features/auth/types";
-import { authenticateUser, usersMock } from "@/features/auth/mock";
+import { useState, type ReactNode } from "react";
 
-interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
-}
+import type { LoginCredentials, User } from "@/features/auth/types";
+import { login as loginService } from "@/services/auth.service";
 
-const AuthContext = createContext<AuthContextType | null>(null);
+import { AuthContext, type AuthContextType } from "./auth.context";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (email: string, password: string): boolean => {
-    const authenticatedUser = authenticateUser(email, password);
-    if (authenticatedUser) {
-      setUser(authenticatedUser);
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      const response = await loginService(credentials);
+      setUser(response.user);
       return true;
+    } catch {
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
@@ -34,16 +30,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-}
-
-export function getCurrentMockUser(role: "admin" | "doctor" | "receptionist") {
-  return usersMock.find((u) => u.role === role);
 }
