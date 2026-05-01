@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, forwardRef, useImperativeHandle, type ChangeEvent, type FormEvent, type Ref } from "react";
 
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
@@ -17,6 +17,7 @@ type PatientFormProps = {
   onSuccess: () => void;
   onCancel: () => void;
   validateCpfUnique: (cpf: string) => Promise<boolean>;
+  showActions?: boolean;
 };
 
 function getInitialData(initialData?: PatientFormData): PatientFormData {
@@ -27,14 +28,19 @@ function getInitialData(initialData?: PatientFormData): PatientFormData {
   };
 }
 
-export function PatientForm({
-  initialData,
-  submitLabel,
-  onSubmit,
-  onSuccess,
-  onCancel,
-  validateCpfUnique,
-}: PatientFormProps) {
+export const PatientForm = forwardRef(
+  function PatientFormInner(
+    {
+      initialData,
+      submitLabel,
+      onSubmit,
+      onSuccess,
+      onCancel,
+      validateCpfUnique,
+      showActions = true,
+    }: PatientFormProps,
+    ref: Ref<{ submit: () => void }>
+  ) {
   const [formData, setFormData] = useState<PatientFormData>(() => getInitialData(initialData));
   const [errors, setErrors] = useState<PatientFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -102,6 +108,13 @@ export function PatientForm({
 
   const selectErrorId = errors.healthInsurance ? "healthInsurance-error" : undefined;
 
+  const submit = () => {
+    const form = document.querySelector(".patient-form") as HTMLFormElement;
+    form?.requestSubmit();
+  };
+
+  useImperativeHandle(ref, () => ({ submit }), []);
+
   return (
     <form className="patient-form" onSubmit={handleSubmit} noValidate>
       {formError && <p className="patient-feedback danger">{formError}</p>}
@@ -157,7 +170,7 @@ export function PatientForm({
           required
         />
 
-        <div className="input-wrapper patient-form-field-wide">
+        <div className="input-wrapper">
           <label className="input-label" htmlFor="healthInsurance">
             Convênio
           </label>
@@ -186,14 +199,16 @@ export function PatientForm({
         </div>
       </div>
 
-      <div className="form-actions">
-        <Button type="submit" isLoading={isSubmitting}>
-          {submitLabel}
-        </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
-          Cancelar
-        </Button>
-      </div>
+      {showActions && (
+        <div className="form-actions">
+          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+            Cancelar
+          </Button>
+          <Button type="submit" isLoading={isSubmitting}>
+            {submitLabel}
+          </Button>
+        </div>
+      )}
     </form>
   );
-}
+});

@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X, Check } from "lucide-react";
+
+import { Button } from "@/components/common/Button";
 
 import {
   checkCpfExists,
@@ -19,6 +21,7 @@ export function PatientFormPage() {
   const [initialData, setInitialData] = useState<PatientFormData | undefined>();
   const [isLoading, setIsLoading] = useState(isEditing);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const formRef = useRef<{ submit: () => void }>(null);
 
   useEffect(() => {
     if (!patientId) return;
@@ -104,6 +107,7 @@ export function PatientFormPage() {
           </div>
         ) : (
           <PatientForm
+            ref={formRef}
             key={patientId ?? "new"}
             initialData={initialData}
             submitLabel={isEditing ? "Salvar alterações" : "Salvar paciente"}
@@ -111,9 +115,21 @@ export function PatientFormPage() {
             onSuccess={() => navigate("/patients")}
             onCancel={() => navigate("/patients")}
             validateCpfUnique={handleCpfUniqueValidation}
+            showActions={false}
           />
         )}
       </section>
+
+      <div className="form-actions-bottom">
+        <Button variant="secondary" onClick={() => navigate("/patients")}>
+          <X size={16} aria-hidden="true" />
+          Cancelar
+        </Button>
+        <Button onClick={() => formRef.current?.submit()}>
+          <Check size={16} aria-hidden="true" />
+          Salvar
+        </Button>
+      </div>
     </div>
   );
 }

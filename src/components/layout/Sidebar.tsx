@@ -52,7 +52,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             return (
               <li key={path}>
                 <Link className={`nav-link ${isActive ? 'active' : ''}`} to={path}>
-                  <Icon size={18} aria-hidden="true" />
+                  <Icon size={18} strokeWidth={isActive ? 2.75 : 2.25} aria-hidden="true" />
                   <span>{label}</span>
                 </Link>
               </li>

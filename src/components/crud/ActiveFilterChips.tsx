@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+
 export type ActiveFilterChip = {
   id: string;
   value: string;
@@ -23,7 +25,8 @@ export function ActiveFilterChips({ filters, onRemove }: ActiveFilterChipsProps)
           onClick={() => onRemove(filter)}
           aria-label={`Remover filtro ${filter.value}`}
         >
-          {filter.value}
+          <span>{filter.value}</span>
+          <X size={14} aria-hidden="true" />
         </button>
       ))}
     </div>

@@ -17,7 +17,7 @@ export function CrudTableSection({
   const hasHeader = Boolean(title || description || summary);
 
   return (
-    <section className="card crud-table-card" aria-labelledby={title ? titleId : undefined}>
+    <section className="crud-table-card" aria-labelledby={title ? titleId : undefined}>
       {hasHeader && (
         <div className="section-header crud-table-header">
           {(title || description) && (

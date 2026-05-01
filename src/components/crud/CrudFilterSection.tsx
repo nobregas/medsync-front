@@ -45,15 +45,15 @@ export function CrudFilterSection({
       <form className="crud-filter-form" onSubmit={onSubmit}>
         <div className="crud-filter-fields">{children}</div>
         <div className="crud-filter-actions">
-          <button
-            className="button secondary"
-            type="button"
-            onClick={onClear}
-            disabled={disabled || !canClear}
-          >
+<button
+             className="button filter-clear"
+             type="button"
+             onClick={onClear}
+             disabled={disabled || !canClear}
+           >
             {clearLabel}
           </button>
-          <button className="button primary" type="submit" disabled={disabled}>
+          <button className="button filter-submit" type="submit" disabled={disabled}>
             <Filter size={18} aria-hidden="true" />
             {submitLabel}
           </button>

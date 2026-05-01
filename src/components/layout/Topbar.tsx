@@ -55,12 +55,14 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       <div className="topbar-actions">
         <button className="button secondary" type="button">
           <CalendarDays size={17} aria-hidden="true" />
-          Ver calendario
+          Ver calendário
         </button>
-        <button className="button primary" type="button">
+        <button className="button outline" type="button">
           <Plus size={17} aria-hidden="true" />
           Nova consulta
         </button>
+
+        <span className="topbar-divider" aria-hidden="true">|</span>
 
         <div className="user-menu">
           <button

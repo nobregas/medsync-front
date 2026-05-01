@@ -32,6 +32,11 @@
   --color-danger-text: #b91c1c;
   --color-warning-bg: #fef3c7;
   --color-warning-text: #b45309;
+  --color-gray-50: #f9fafb;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-500: #6b7280;
+  --color-gray-700: #374151;
   --shadow-soft: 0 20px 45px rgba(15, 23, 42, 0.08);
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;

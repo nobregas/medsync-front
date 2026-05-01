@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { Input } from "@/components/common/Input";
 import { ActiveFilterChips, type ActiveFilterChip } from "@/components/crud/ActiveFilterChips";
 import { CrudFilterSection } from "@/components/crud/CrudFilterSection";
+import { CrudPagination } from "@/components/crud/CrudPagination";
 import { CrudTableSection } from "@/components/crud/CrudTableSection";
 import { formatCpf, onlyDigits } from "@/lib/cpf";
 import { deletePatient, getPatients } from "@/services/patient.service";
@@ -22,6 +23,8 @@ const emptyPatientFilters: PatientFilters = {
   cpf: "",
 };
 
+const patientsPageSize = 5;
+
 export function PatientListPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filters, setFilters] = useState<PatientFilters>(emptyPatientFilters);
@@ -29,6 +32,7 @@ export function PatientListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingPatientId, setDeletingPatientId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     let isMounted = true;
@@ -70,6 +74,14 @@ export function PatientListPage() {
       return matchesName && matchesCpf;
     })
     .sort((first, second) => first.fullName.localeCompare(second.fullName));
+  const totalPages = Math.max(1, Math.ceil(visiblePatients.length / patientsPageSize));
+  const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
+  const firstVisiblePatientIndex = (safeCurrentPage - 1) * patientsPageSize;
+  const paginatedPatients = visiblePatients.slice(
+    firstVisiblePatientIndex,
+    firstVisiblePatientIndex + patientsPageSize,
+  );
+  const patientLabel = visiblePatients.length === 1 ? "paciente" : "pacientes";
 
   const activeFilters: ActiveFilterChip[] = [
     ...(appliedFilters.fullName.trim()
@@ -88,11 +100,13 @@ export function PatientListPage() {
       fullName: filters.fullName.trim(),
       cpf: filters.cpf.trim(),
     });
+    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
     setFilters(emptyPatientFilters);
     setAppliedFilters(emptyPatientFilters);
+    setCurrentPage(1);
   };
 
   const handleRemoveFilter = (filter: ActiveFilterChip) => {
@@ -100,6 +114,7 @@ export function PatientListPage() {
 
     setFilters((current) => ({ ...current, [filterId]: "" }));
     setAppliedFilters((current) => ({ ...current, [filterId]: "" }));
+    setCurrentPage(1);
   };
 
   const handleDelete = async (patient: Patient) => {
@@ -176,11 +191,20 @@ export function PatientListPage() {
             <p>Buscando os dados mockados da recepção.</p>
           </div>
         ) : visiblePatients.length > 0 ? (
-          <PatientTable
-            patients={visiblePatients}
-            deletingPatientId={deletingPatientId}
-            onDelete={handleDelete}
-          />
+          <>
+            <PatientTable
+              patients={paginatedPatients}
+              deletingPatientId={deletingPatientId}
+              onDelete={handleDelete}
+            />
+            <CrudPagination
+              currentPage={safeCurrentPage}
+              totalItems={visiblePatients.length}
+              pageSize={patientsPageSize}
+              itemLabel={patientLabel}
+              onPageChange={setCurrentPage}
+            />
+          </>
         ) : (
           <div className="empty-state">
             <h3>Nenhum paciente encontrado</h3>
