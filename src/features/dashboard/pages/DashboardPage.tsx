@@ -19,13 +19,7 @@ export function DashboardPage() {
   return (
     <div className="dashboard-page">
       <section className="page-header">
-        <div>
-          <p className="eyebrow">Visão geral</p>
-          <h2 className="page-title">Resumo da recepção</h2>
-          <p className="page-description">
-            Acompanhamento rápido das consultas de hoje, deste mês e dos pacientes cadastrados.
-          </p>
-        </div>
+
       </section>
 
       <section className="grid metric-grid" aria-label="Métricas principais">

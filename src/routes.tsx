@@ -3,6 +3,8 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { DashboardPage } from "./features/dashboard/pages/DashboardPage";
 import { LoginPage } from "./features/auth/pages/LoginPage";
+import { PatientFormPage } from "./features/patients/pages/PatientFormPage";
+import { PatientListPage } from "./features/patients/pages/PatientListPage";
 import { useAuth } from "./hooks/useAuth";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -46,6 +48,9 @@ export function AppRoutes() {
         }
       >
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/patients" element={<PatientListPage />} />
+        <Route path="/patients/new" element={<PatientFormPage />} />
+        <Route path="/patients/:patientId/edit" element={<PatientFormPage />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />

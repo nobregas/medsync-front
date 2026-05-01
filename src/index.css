@@ -199,6 +199,25 @@ a {
   background: var(--color-primary-700);
 }
 
+.btn-secondary {
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}
+
+.btn-danger {
+  color: var(--color-danger-text);
+  background: var(--color-danger-bg);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fecaca;
+}
+
 .btn-loading {
   position: relative;
 }

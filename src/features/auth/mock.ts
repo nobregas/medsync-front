@@ -22,7 +22,7 @@ export const usersMock: User[] = [
   {
     id: "3",
     name: "Carlos Silva",
-    email: "receptionista@recepcionista.com",
+    email: "recepcionista@recepcionista.com",
     cpf: "345.678.901-22",
     role: "receptionist",
     createdAt: "2026-01-01",
@@ -33,7 +33,7 @@ export const usersMock: User[] = [
 export const loginCredentials = [
   { email: "admin@medsync.com", password: "admin123", role: "admin" as const },
   { email: "ana@medsync.com", password: "doctor123", role: "doctor" as const },
-  { email: "receptionista@recepcionista.com", password: "123456", role: "receptionist" as const },
+  { email: "recepcionista@recepcionista.com", password: "123456", role: "receptionist" as const },
 ];
 
 export function authenticateUser(email: string, password: string): User | null {

@@ -44,17 +44,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <nav>
         <ul className="nav-list">
-          {navItems.map(({ label, icon: Icon, path }) => (
-            <li key={path}>
-              <Link
-                className={`nav-link ${location.pathname === path ? 'active' : ''}`}
-                to={path}
-              >
-                <Icon size={18} aria-hidden="true" />
-                <span>{label}</span>
-              </Link>
-            </li>
-          ))}
+          {navItems.map(({ label, icon: Icon, path }) => {
+            const isActive =
+              location.pathname === path ||
+              (path !== '/dashboard' && location.pathname.startsWith(`${path}/`))
+
+            return (
+              <li key={path}>
+                <Link className={`nav-link ${isActive ? 'active' : ''}`} to={path}>
+                  <Icon size={18} aria-hidden="true" />
+                  <span>{label}</span>
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </nav>
     </aside>
