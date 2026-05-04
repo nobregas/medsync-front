@@ -4,68 +4,11 @@ import { hasDoctorScheduleConflict } from "@/features/appointments/utils/appoint
 
 type AppointmentPayload = Omit<Appointment, "id" | "status">;
 
-const STORAGE_KEY = "medsync:appointments";
-
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isAppointment(value: unknown): value is Appointment {
-  if (!value || typeof value !== "object") return false;
-
-  const appointment = value as Record<string, unknown>;
-
-  return (
-    typeof appointment.id === "string" &&
-    typeof appointment.patientId === "string" &&
-    typeof appointment.doctorId === "string" &&
-    typeof appointment.date === "string" &&
-    typeof appointment.time === "string" &&
-    (appointment.status === "scheduled" ||
-      appointment.status === "completed" ||
-      appointment.status === "cancelled") &&
-    (appointment.notes === undefined || typeof appointment.notes === "string")
-  );
-}
-
-function persistAppointments(appointments: Appointment[]) {
-  if (typeof window === "undefined") return;
-
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-}
-
 function readAppointments(): Appointment[] {
-  if (typeof window === "undefined") {
-    return [...appointmentsMock];
-  }
-
-  const storedAppointments = window.localStorage.getItem(STORAGE_KEY);
-
-  if (!storedAppointments) {
-    persistAppointments(appointmentsMock);
-    return [...appointmentsMock];
-  }
-
-  try {
-    const parsedAppointments: unknown = JSON.parse(storedAppointments);
-
-    if (Array.isArray(parsedAppointments)) {
-      const validAppointments = parsedAppointments.filter(isAppointment);
-
-      if (validAppointments.length === parsedAppointments.length) {
-        return validAppointments;
-      }
-
-      if (validAppointments.length > 0) {
-        persistAppointments(validAppointments);
-        return validAppointments;
-      }
-    }
-  } catch {
-    persistAppointments(appointmentsMock);
-  }
-
-  persistAppointments(appointmentsMock);
   return [...appointmentsMock];
 }
 
@@ -113,7 +56,7 @@ export async function createAppointment(data: AppointmentPayload): Promise<Appoi
     status: "scheduled",
   };
   
-  persistAppointments([...appointments, newAppointment]);
+  appointments.push(newAppointment);
   return newAppointment;
 }
 
@@ -149,7 +92,6 @@ export async function updateAppointment(
   }
   
   appointments[index] = nextAppointment;
-  persistAppointments(appointments);
   return nextAppointment;
 }
 
@@ -169,7 +111,6 @@ export async function updateAppointmentStatus(
     ...appointments[index],
     status,
   };
-  persistAppointments(appointments);
   return appointments[index];
 }
 
@@ -182,5 +123,5 @@ export async function deleteAppointment(id: string): Promise<void> {
     throw new Error("Consulta não encontrada");
   }
   
-  persistAppointments(appointments.filter((appointment) => appointment.id !== id));
+  appointments.splice(index, 1);
 }

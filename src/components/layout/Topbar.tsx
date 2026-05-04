@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarDays, LogOut, Menu, Plus } from 'lucide-react'
+import { CalendarDays, ChevronDown, LogOut, Menu, Plus } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { canAccess, permissions } from '@/types/role'
@@ -69,7 +69,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           </button>
         )}
         {canCreateAppointment && (
-          <button className="button outline" type="button" onClick={() => navigate('/appointments/new')}>
+          <button className="button accent" type="button" onClick={() => navigate('/appointments/new')}>
             <Plus size={17} aria-hidden="true" />
             Nova consulta
           </button>
@@ -78,15 +78,30 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         <span className="topbar-divider" aria-hidden="true">|</span>
 
         <div className="user-menu">
-          <button
-            className="avatar-button"
-            type="button"
-            aria-expanded={isUserMenuOpen}
-            aria-haspopup="menu"
-            onClick={() => setIsUserMenuOpen((isOpen) => !isOpen)}
-          >
-            {user ? getInitials(user.name) : '??'}
-          </button>
+          <div className="avatar-wrapper">
+            <button
+              className="avatar-button"
+              type="button"
+              aria-expanded={isUserMenuOpen}
+              aria-haspopup="menu"
+              onClick={() => setIsUserMenuOpen((isOpen) => !isOpen)}
+            >
+              {user ? getInitials(user.name) : '??'}
+            </button>
+            <button
+              className="avatar-chevron-button"
+              type="button"
+              aria-expanded={isUserMenuOpen}
+              aria-label="Abrir menu do usuário"
+              onClick={() => setIsUserMenuOpen((isOpen) => !isOpen)}
+            >
+              <ChevronDown
+                size={18}
+                className={isUserMenuOpen ? 'chevron-open' : ''}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
 
           {isUserMenuOpen && (
             <div className="logout-popover" role="menu">
