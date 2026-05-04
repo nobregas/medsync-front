@@ -539,12 +539,17 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: linear-gradient(90deg, #ffffff, #f8fafc);
   transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.appointment-card > div:nth-child(2) {
+  min-width: 0;
+  overflow: visible;
 }
 
 .appointment-card:hover {
@@ -561,12 +566,20 @@
 .appointment-patient {
   margin: 0;
   font-weight: 800;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .appointment-meta {
   margin: 0.25rem 0 0;
   color: var(--color-text-muted);
   font-size: 0.88rem;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .badge {
@@ -653,15 +666,13 @@
 
 .crud-filter-form {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.75rem;
-  align-items: end;
 }
 
 .crud-filter-fields {
   display: grid;
-  flex: 1 1 34rem;
-  grid-template-columns: 3fr minmax(12rem, 1fr);
+  grid-template-columns: 2fr 1.5fr minmax(10rem, 1fr) minmax(10rem, 1fr);
   gap: 0.75rem;
   align-items: end;
 }
@@ -1083,17 +1094,16 @@
 
 .weekly-calendar {
   display: grid;
-  grid-template-columns: repeat(7, minmax(13rem, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(7, minmax(16rem, 1fr));
+  gap: 1.25rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.5rem;
 }
 
 .calendar-day-card {
   display: grid;
   align-content: start;
   gap: 0.75rem;
-  min-width: 13rem;
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -1123,19 +1133,45 @@
 
 .appointment-calendar-list {
   display: grid;
-  gap: 0.65rem;
-  max-height: 320px;
+  gap: 0.75rem;
+  max-height: 400px;
   overflow-y: auto;
 }
 
 .weekly-calendar .appointment-card {
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-  align-items: flex-start;
-  padding: 0.8rem;
-  min-height: 80px;
-  max-height: 80px;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.85rem;
+  min-height: 72px;
+  overflow: visible;
+}
+
+.weekly-calendar .appointment-time {
+  grid-column: 1 / 2;
+  grid-row: 1;
+}
+
+.weekly-calendar .appointment-card > .badge {
+  grid-column: 2 / 3;
+  grid-row: 1;
+}
+
+.weekly-calendar .appointment-card > div:nth-child(2) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
+  width: 100%;
+  overflow: visible;
+}
+
+.weekly-calendar .appointment-patient,
+.weekly-calendar .appointment-meta {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .calendar-empty {
@@ -1204,9 +1240,12 @@
     animation: fade-up 160ms ease both;
   }
 
-  .metric-grid,
-  .dashboard-grid {
+  .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 
   .appointment-form-layout {
@@ -1215,6 +1254,24 @@
 
   .appointment-assist-card {
     position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-card {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    align-items: flex-start;
   }
 }
 
@@ -1295,5 +1352,50 @@
   .appointment-card {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-content,
+  .sidebar,
+  .topbar {
+    padding: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 0.95rem;
+  }
+
+  .section-description {
+    font-size: 0.85rem;
+  }
+
+  .appointment-time {
+    font-size: 0.9rem;
+  }
+
+  .appointment-patient {
+    font-size: 0.95rem;
+  }
+
+  .badge {
+    padding: 0 0.5rem;
+    font-size: 0.7rem;
+    min-height: 1.5rem;
+  }
+
+  .metric-card {
+    min-height: 6rem;
+    padding: 0.75rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 0.75rem;
   }
 }

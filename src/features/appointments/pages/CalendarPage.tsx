@@ -94,9 +94,6 @@ export function CalendarPage() {
         <div>
           <p className="eyebrow">Calendário</p>
           <h2 className="page-title">Agenda semanal</h2>
-          <p className="page-description">
-            Visualize a semana da clínica e identifique horários ocupados por médico.
-          </p>
         </div>
         <div className="button-row">
           {canCreateAppointment && (
