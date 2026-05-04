@@ -1,45 +1,110 @@
 import type { Appointment, AppointmentStatus } from "@/features/appointments/types";
-import { 
-  appointmentsMock, 
-  getAppointmentsByPatient,
-  hasScheduleConflict 
-} from "@/features/appointments/mock";
+import { appointmentsMock } from "@/features/appointments/mock";
+import { hasDoctorScheduleConflict } from "@/features/appointments/utils/appointmentRules";
+
+type AppointmentPayload = Omit<Appointment, "id" | "status">;
+
+const STORAGE_KEY = "medsync:appointments";
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isAppointment(value: unknown): value is Appointment {
+  if (!value || typeof value !== "object") return false;
+
+  const appointment = value as Record<string, unknown>;
+
+  return (
+    typeof appointment.id === "string" &&
+    typeof appointment.patientId === "string" &&
+    typeof appointment.doctorId === "string" &&
+    typeof appointment.date === "string" &&
+    typeof appointment.time === "string" &&
+    (appointment.status === "scheduled" ||
+      appointment.status === "completed" ||
+      appointment.status === "cancelled") &&
+    (appointment.notes === undefined || typeof appointment.notes === "string")
+  );
+}
+
+function persistAppointments(appointments: Appointment[]) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+}
+
+function readAppointments(): Appointment[] {
+  if (typeof window === "undefined") {
+    return [...appointmentsMock];
+  }
+
+  const storedAppointments = window.localStorage.getItem(STORAGE_KEY);
+
+  if (!storedAppointments) {
+    persistAppointments(appointmentsMock);
+    return [...appointmentsMock];
+  }
+
+  try {
+    const parsedAppointments: unknown = JSON.parse(storedAppointments);
+
+    if (Array.isArray(parsedAppointments)) {
+      const validAppointments = parsedAppointments.filter(isAppointment);
+
+      if (validAppointments.length === parsedAppointments.length) {
+        return validAppointments;
+      }
+
+      if (validAppointments.length > 0) {
+        persistAppointments(validAppointments);
+        return validAppointments;
+      }
+    }
+  } catch {
+    persistAppointments(appointmentsMock);
+  }
+
+  persistAppointments(appointmentsMock);
+  return [...appointmentsMock];
+}
 
 export async function getAppointments(): Promise<Appointment[]> {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return appointmentsMock;
+  await delay(300);
+  return readAppointments();
 }
 
 export async function getAppointmentsByDateRange(startDate: string, endDate: string): Promise<Appointment[]> {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await delay(300);
   
-  return appointmentsMock.filter((a) => {
+  return readAppointments().filter((a) => {
     return a.date >= startDate && a.date <= endDate;
   });
 }
 
 export async function getAppointment(id: string): Promise<Appointment | null> {
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  return appointmentsMock.find((a) => a.id === id) ?? null;
+  await delay(200);
+  return readAppointments().find((a) => a.id === id) ?? null;
 }
 
 export async function getPatientAppointments(patientId: string): Promise<Appointment[]> {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return getAppointmentsByPatient(patientId);
+  await delay(300);
+  return readAppointments().filter((appointment) => appointment.patientId === patientId);
 }
 
-export async function createAppointment(data: {
-  patientId: string;
-  doctorId: string;
-  date: string;
-  time: string;
-  notes?: string;
-}): Promise<Appointment> {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+export async function createAppointment(data: AppointmentPayload): Promise<Appointment> {
+  await delay(500);
+  const appointments = readAppointments();
   
-  const conflict = hasScheduleConflict(data.doctorId, data.date, data.time);
+  const conflict = hasDoctorScheduleConflict({
+    appointments,
+    doctorId: data.doctorId,
+    date: data.date,
+    time: data.time,
+  });
+
   if (conflict) {
-    throw new Error("Conflito de horário: Este médico já possui uma consulta neste horário");
+    throw new Error("Este médico já possui consulta nesse horário.");
   }
   
   const newAppointment: Appointment = {
@@ -48,7 +113,7 @@ export async function createAppointment(data: {
     status: "scheduled",
   };
   
-  appointmentsMock.push(newAppointment);
+  persistAppointments([...appointments, newAppointment]);
   return newAppointment;
 }
 
@@ -56,51 +121,66 @@ export async function updateAppointment(
   id: string, 
   data: Partial<Appointment>
 ): Promise<Appointment> {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await delay(500);
+  const appointments = readAppointments();
   
-  const index = appointmentsMock.findIndex((a) => a.id === id);
+  const index = appointments.findIndex((a) => a.id === id);
   if (index === -1) {
     throw new Error("Consulta não encontrada");
   }
-  
-  if (data.doctorId && data.date && data.time) {
-    const conflict = hasScheduleConflict(data.doctorId, data.date, data.time, id);
-    if (conflict) {
-      throw new Error("Conflito de horário: Este médico já possui uma consulta neste horário");
-    }
-  }
-  
-  const updated = {
-    ...appointmentsMock[index],
+
+  const nextAppointment = {
+    ...appointments[index],
     ...data,
   };
   
-  appointmentsMock[index] = updated;
-  return updated;
+  if (nextAppointment.status !== "cancelled") {
+    const conflict = hasDoctorScheduleConflict({
+      appointments,
+      doctorId: nextAppointment.doctorId,
+      date: nextAppointment.date,
+      time: nextAppointment.time,
+      excludeId: id,
+    });
+
+    if (conflict) {
+      throw new Error("Este médico já possui consulta nesse horário.");
+    }
+  }
+  
+  appointments[index] = nextAppointment;
+  persistAppointments(appointments);
+  return nextAppointment;
 }
 
 export async function updateAppointmentStatus(
   id: string, 
   status: AppointmentStatus
 ): Promise<Appointment> {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await delay(300);
+  const appointments = readAppointments();
   
-  const index = appointmentsMock.findIndex((a) => a.id === id);
+  const index = appointments.findIndex((a) => a.id === id);
   if (index === -1) {
     throw new Error("Consulta não encontrada");
   }
   
-  appointmentsMock[index].status = status;
-  return appointmentsMock[index];
+  appointments[index] = {
+    ...appointments[index],
+    status,
+  };
+  persistAppointments(appointments);
+  return appointments[index];
 }
 
 export async function deleteAppointment(id: string): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await delay(500);
+  const appointments = readAppointments();
   
-  const index = appointmentsMock.findIndex((a) => a.id === id);
+  const index = appointments.findIndex((a) => a.id === id);
   if (index === -1) {
     throw new Error("Consulta não encontrada");
   }
   
-  appointmentsMock.splice(index, 1);
+  persistAppointments(appointments.filter((appointment) => appointment.id !== id));
 }

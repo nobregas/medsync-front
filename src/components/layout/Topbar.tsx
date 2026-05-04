@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CalendarDays, LogOut, Menu, Plus } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
+import { canAccess, permissions } from '@/types/role'
 
 type TopbarProps = {
   onMenuClick: () => void
@@ -11,6 +12,14 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const canOpenCalendar = user ? canAccess(user.role, permissions.appointmentCalendar) : false
+  const canCreateAppointment = user ? canAccess(user.role, permissions.appointmentCreate) : false
+  const todayLabel = new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date())
 
   const handleLogout = () => {
     logout()
@@ -48,19 +57,23 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
         <div>
           <p className="topbar-title">Resumo operacional</p>
-          <p className="topbar-date">Quarta-feira, 29 de abril de 2026</p>
+          <p className="topbar-date">{todayLabel}</p>
         </div>
       </div>
 
       <div className="topbar-actions">
-        <button className="button secondary" type="button">
-          <CalendarDays size={17} aria-hidden="true" />
-          Ver calendário
-        </button>
-        <button className="button outline" type="button">
-          <Plus size={17} aria-hidden="true" />
-          Nova consulta
-        </button>
+        {canOpenCalendar && (
+          <button className="button secondary" type="button" onClick={() => navigate('/calendar')}>
+            <CalendarDays size={17} aria-hidden="true" />
+            Ver calendário
+          </button>
+        )}
+        {canCreateAppointment && (
+          <button className="button outline" type="button" onClick={() => navigate('/appointments/new')}>
+            <Plus size={17} aria-hidden="true" />
+            Nova consulta
+          </button>
+        )}
 
         <span className="topbar-divider" aria-hidden="true">|</span>
 

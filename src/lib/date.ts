@@ -1,6 +1,16 @@
+function parseLocalDate(date: string): Date {
+  const [year, month, day] = date.split("-").map(Number);
+
+  if (year && month && day) {
+    return new Date(year, month - 1, day);
+  }
+
+  return new Date(date);
+}
+
 export function formatDateToBr(date: string): string {
   if (!date) return "";
-  const d = new Date(date);
+  const d = parseLocalDate(date);
   return new Intl.DateTimeFormat("pt-BR").format(d);
 }
 
@@ -39,11 +49,11 @@ export function isToday(date: string): boolean {
 }
 
 export function getDayName(date: string): string {
-  const d = new Date(date);
+  const d = parseLocalDate(date);
   return new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(d);
 }
 
 export function getShortDayName(date: string): string {
-  const d = new Date(date);
+  const d = parseLocalDate(date);
   return new Intl.DateTimeFormat("pt-BR", { weekday: "short" }).format(d);
 }

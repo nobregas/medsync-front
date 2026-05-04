@@ -44,7 +44,7 @@ Usuário recepcionista:
 
 ---
 
-## 3. Cadastro de Pacientes
+## 3. Cadastro de Pacientes [x]
 
 ### 3.1 Formulário de Cadastro
 - Nome completo (obrigatório)
@@ -74,7 +74,7 @@ Usuário recepcionista:
 
 ---
 
-## 4. Busca e Listagem de Pacientes
+## 4. Busca e Listagem de Pacientes [x]
 
 ### 4.1 Busca (Frontend)
 - Busca por nome (filtro no array mock)
@@ -84,7 +84,7 @@ Usuário recepcionista:
 ### 4.2 Listagem
 - Tabela com todos os pacientes mockados
 - Ordenação por nome
-- Ações: editar, visualizar detalhes
+- Ações: editar, visualizar detalhes (todo)
 
 ---
 

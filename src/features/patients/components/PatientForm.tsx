@@ -2,6 +2,7 @@ import { useState, forwardRef, useImperativeHandle, type ChangeEvent, type FormE
 
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
+import { Select } from "@/components/common/Select";
 import { formatCpf } from "@/lib/cpf";
 import { formatPhone } from "@/lib/formatters";
 
@@ -106,8 +107,6 @@ export const PatientForm = forwardRef(
     }
   };
 
-  const selectErrorId = errors.healthInsurance ? "healthInsurance-error" : undefined;
-
   const submit = () => {
     const form = document.querySelector(".patient-form") as HTMLFormElement;
     form?.requestSubmit();
@@ -170,33 +169,19 @@ export const PatientForm = forwardRef(
           required
         />
 
-        <div className="input-wrapper">
-          <label className="input-label" htmlFor="healthInsurance">
-            Convênio
-          </label>
-          <select
-            id="healthInsurance"
-            name="healthInsurance"
-            className={`input-field ${errors.healthInsurance ? "input-error" : ""}`}
-            value={formData.healthInsurance ?? ""}
-            onChange={handleChange}
-            aria-invalid={errors.healthInsurance ? true : undefined}
-            aria-describedby={selectErrorId}
-            disabled={isSubmitting}
-          >
-            <option value="">Sem convênio informado</option>
-            {healthInsuranceOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          {errors.healthInsurance && (
-            <p id={selectErrorId} className="input-error-message">
-              {errors.healthInsurance}
-            </p>
-          )}
-        </div>
+        <Select
+          name="healthInsurance"
+          label="Convênio"
+          placeholder="Sem convênio informado"
+          value={formData.healthInsurance ?? ""}
+          onChange={handleChange}
+          error={errors.healthInsurance}
+          disabled={isSubmitting}
+          options={healthInsuranceOptions.map((option) => ({
+            value: option,
+            label: option,
+          }))}
+        />
       </div>
 
       {showActions && (
