@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Input } from "@/components/common/Input";
 import { ActiveFilterChips, type ActiveFilterChip } from "@/components/crud/ActiveFilterChips";
 import { CrudFilterSection } from "@/components/crud/CrudFilterSection";
@@ -32,6 +33,7 @@ export function PatientListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingPatientId, setDeletingPatientId] = useState<string | null>(null);
+  const [patientToDelete, setPatientToDelete] = useState<Patient | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -117,22 +119,29 @@ export function PatientListPage() {
     setCurrentPage(1);
   };
 
-  const handleDelete = async (patient: Patient) => {
-    const confirmed = window.confirm(`Deseja excluir o paciente ${patient.fullName}?`);
+  const handleDelete = (patient: Patient) => {
+    setPatientToDelete(patient);
+  };
 
-    if (!confirmed) return;
+  const handleConfirmDelete = async () => {
+    if (!patientToDelete) return;
 
-    setDeletingPatientId(patient.id);
+    setDeletingPatientId(patientToDelete.id);
     setError(null);
 
     try {
-      await deletePatient(patient.id);
-      setPatients((current) => current.filter((item) => item.id !== patient.id));
+      await deletePatient(patientToDelete.id);
+      setPatients((current) => current.filter((item) => item.id !== patientToDelete.id));
     } catch {
       setError("Não foi possível excluir o paciente.");
     } finally {
       setDeletingPatientId(null);
+      setPatientToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setPatientToDelete(null);
   };
 
   return (
@@ -183,6 +192,17 @@ export function PatientListPage() {
       <ActiveFilterChips filters={activeFilters} onRemove={handleRemoveFilter} />
 
       <CrudTableSection>
+        <ConfirmDialog
+          isOpen={patientToDelete !== null}
+          title="Excluir paciente"
+          message={`Tem certeza que deseja excluir o paciente ${patientToDelete?.fullName}? Esta ação não pode ser desfeita.`}
+          confirmLabel="Excluir"
+          cancelLabel="Cancelar"
+          variant="danger"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+
         {error && <p className="patient-feedback danger">{error}</p>}
 
         {isLoading ? (
